@@ -25,13 +25,6 @@ const char *new_dyld_get_image_name(int image_index)
   result = (char *)orig_dyld_get_image_name(image_index);
   NSArray<NSString*>* blacklisted = @[
     @"MobileSubstrate",
-    @"substrate",
-    @"Substrate",
-    @"librocketbootstrap",
-    @"libcolorpicker",
-    @"substitute",
-    @"Library/Frameworks",
-    @"Library/Caches",
     @"bfdecrypt.dylib",
     @"allbypass.dylib",
     @"HideJB.dylib",
