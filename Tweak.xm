@@ -36,7 +36,7 @@ const char *new_dyld_get_image_name(int image_index)
     if([[NSString stringWithUTF8String:result] containsString:bannedProc])
     {
         //NSLog(@"KMSKMS2 %s",result);
-        result = (char *)orig_dyld_get_image_name(0);
+        result = (char *)"";
         break;
     }
   }
@@ -92,6 +92,56 @@ int new_lstat(const char *path,struct stat *buf)
     }
     return orig_lstat(path,buf);
 }
+
+
+%hook NSFileManager
+
+- (BOOL)fileExistsAtPath:(NSString *)path {
+	NSLog(@"KMSKMS NSFileManager fileExistsAtPath: %s", TO_CSTR(path));
+	NSArray<NSString*>* blacklisted = @[
+    @"/Applications/Cydia.app",
+    @"/bin/sh",
+    @"/bin/bash",
+    @"/Library/MobileSubstrate/MobileSubstrate.dylib",
+    @"/usr/sbin/sshd",
+    @"/etc/apt",
+	@"/usr/bin/ssh",
+	@"/Applications/blackra1n.app",
+	@"/Applications/FakeCarrier.app",
+	@"/Applications/Icy.app",
+	@"/Applications/IntelliScreen.app",
+	@"/Applications/MxTube.app",
+	@"/Applications/RockApp.app",
+	@"/Applications/SBSettings.app",
+	@"/Applications/WinterBoard.app",
+	@"/Library/MobileSubstrate/DynamicLibraries/LiveClock.plist",
+	@"/Library/MobileSubstrate/DynamicLibraries/Veency.plist",
+	@"/private/var/lib/apt",
+	@"/private/var/lib/cydia",
+	@"/private/var/mobile/Library/SBSettings/Themes",
+	@"/private/var/stash",
+	@"/private/var/tmp/cydia.log",
+	@"/System/Library/LaunchDaemons/com.ikey.bbot.plist",
+	@"/System/Library/LaunchDaemons/com.saurik.Cydia.Startup.plist",
+	@"/usr/bin/sshd",
+	@"/usr/libexec/sftp-server",
+  ];
+  for(NSString* bannedProc in blacklisted)
+  {
+    if([[NSString stringWithUTF8String:result] containsString:bannedProc])
+    {
+        //NSLog(@"KMSKMS2 %s",result);
+        return 0;
+    }
+  }
+  
+	return %orig(path);
+}
+
+%end
+
+
+
 
 %hook UIApplication
 - (BOOL)canOpenURL:(NSURL *)url {
